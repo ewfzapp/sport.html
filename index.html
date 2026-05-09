@@ -895,7 +895,7 @@ Sois très précis et concret. Format : titres en ## et ###, listes à tirets.`;
   output.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Création de votre programme personnalisé<span class="loading-dots"></span></div></div>';
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

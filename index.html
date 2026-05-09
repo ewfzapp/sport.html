@@ -876,35 +876,36 @@ async function generateProgram() {
   const raceCtx = state.sport === 'running' && state.race && state.race !== 'reprise'
     ? `Objectif de compétition : ${state.race}.` : '';
 
-  const prompt = `Tu es un coach sportif expert. Génère un programme de reprise sportive COMPLET en français. Sois CONCIS : chaque séance en 3-4 lignes maximum, pas de phrases longues.
+  const prompt = `Tu es un coach sportif expert. Génère un programme COMPLET et CONCIS en français.
 
 PROFIL :
 - Sport : ${state.sport}${raceCtx ? ' · ' + raceCtx : ''}
-- Âge : ${state.age} ans | Sexe : ${state.sexe} | Poids : ${state.poids} kg | Taille : ${state.taille} cm | IMC : ${imc}
+- ${state.age} ans | ${state.sexe} | ${state.poids} kg | ${state.taille} cm | IMC : ${imc}
 - Inactivité : ${state.inactivite} | Blessures : ${blessuresStr}
 - Niveau : ${state.level} | Objectif : ${state.objectif}
-- Jours : ${state.days.join(', ')} (${state.days.length}j/sem) | Durée : ${state.duree} min | Équipement : ${equipStr}
+- Jours : ${state.days.join(', ')} (${state.days.length}j/sem) | ${state.duree} min/séance | Équipement : ${equipStr}
 ${state.extra ? '- Notes : ' + state.extra : ''}
 
-FORMAT STRICT (respecter impérativement) :
-## Résumé (5 lignes max : durée totale, phases, volume)
-## Phase X : Nom (Semaines X-X)
-### Semaine X
-#### JOUR - Nom séance
-- Objectif : ...
-- Contenu : ... (exercices, durées, distances en 2-3 lignes)
-- Intensité : FC cible ...
-[ligne vide entre chaque séance, pas de blocs récupération séparés]
-## 5 Conseils clés (liste courte)
+FORMAT STRICT :
+## Résumé (3 lignes max)
+## Phase X : Nom (Sem. X-X)
+### Sem. X
+#### JOUR - Nom
+- Contenu : [exercices/distances/durées sur 1-2 lignes]
+- FC : [zone cible]
+[pas de ligne vide entre séances]
+## 5 Conseils clés
 
-RÈGLES :
+RÈGLES ABSOLUES :
 - ${state.sport === 'running' && state.race && state.race !== 'reprise'
-    ? `Prépa ${state.race} : phases fondation/développement/spécifique/affûtage. Toutes les semaines.`
-    : 'Phases adaptation/progression/consolidation. Toutes les semaines.'}
-- Couvrir TOUTES les semaines du programme sans exception
-- Maximum 4 lignes par séance
-- Pas de tableaux, pas de répétition de blocs récupération
-- Titres : ## pour phases, ### pour semaines, #### pour séances`;
+    ? `Prépa ${state.race} : phases fondation/développement/spécifique/affûtage.`
+    : 'Phases adaptation/progression/consolidation.'}
+- TOUTES les semaines sans exception
+- MAX 3 lignes par séance (contenu + FC uniquement)
+- ZÉRO échauffement/retour au calme détaillés (juste mentionner "écht. 10min / retour calme 10min")
+- ZÉRO conseils récupération par semaine (juste le bloc final)
+- ZÉRO tableaux, ZÉRO lignes vides entre séances
+- Titres : ## phases, ### semaines, #### séances`;
 
   const output = document.getElementById('program-output');
   output.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Création de votre programme personnalisé<span class="loading-dots"></span></div></div>';
@@ -967,15 +968,17 @@ RÈGLES :
 
 function renderMarkdown(text) {
   return text
-    .replace(/^#{4,} (.+)$/gm, '<h4 style="font-size:13px;color:var(--amber);margin:10px 0 4px;font-family:var(--font-display)">$1</h4>')
+    .replace(/^#{4,} (.+)$/gm, '<h4 style="font-size:13px;color:var(--amber);margin:8px 0 2px;font-family:var(--font-display)">$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0">')
+    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0">')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^[-•] (.+)$/gm, '<li style="margin-left:18px;margin-bottom:4px;">$1</li>')
-    .replace(/\n/g, '<br>');
+    .replace(/^[-•] (.+)$/gm, '<li style="margin-left:18px;margin-bottom:2px;">$1</li>')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n/g, '<br>')
+    .replace(/(<br>){3,}/g, '<br><br>');
 }
 
 function restart() {
@@ -1026,7 +1029,7 @@ function downloadPDF() {
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
-    if (!line) { y += 3; continue; }
+    if (!line) { y += 1.5; continue; }
 
     // Nouvelle page si besoin
     if (y > pageH - 20) {
@@ -1036,32 +1039,31 @@ function downloadPDF() {
 
     if (line.startsWith('## ') || (line.startsWith('# ') && !line.startsWith('###'))) {
       // Titre H2
-      if (y > marginT + 5) y += 3;
+      if (y > marginT + 5) y += 1;
       doc.setFillColor(20, 24, 50);
       doc.rect(marginL, y - 5, contentW, 9, 'F');
       doc.setFontSize(12);
       doc.setTextColor(45, 212, 191);
       doc.setFont('helvetica', 'bold');
       doc.text(line.replace(/^#{1,2} /, ''), marginL + 2, y);
-      y += 8;
+      y += 7;
 
     } else if (line.startsWith('### ')) {
       // Titre H3
-      y += 2;
+      y += 1;
       doc.setFontSize(10);
       doc.setTextColor(167, 139, 250);
       doc.setFont('helvetica', 'bold');
       doc.text(line.replace('### ', ''), marginL, y);
-      y += 6;
+      y += 5;
 
     } else if (/^#{4,}/.test(line)) {
       // Titre H4
-      y += 1;
       doc.setFontSize(9);
       doc.setTextColor(251, 191, 36);
       doc.setFont('helvetica', 'bold');
       doc.text(line.replace(/^#{4,} /, ''), marginL, y);
-      y += 5;
+      y += 4.5;
 
     } else if (/^-{3,}$/.test(line)) {
       // Séparateur ---
@@ -1080,7 +1082,7 @@ function downloadPDF() {
       wrapped.forEach((wl, i) => {
         if (y > pageH - 20) { doc.addPage(); y = 18; }
         doc.text(wl, marginL + (i === 0 ? 0 : 4), y);
-        y += 4.5;
+        y += 4;
       });
 
     } else {
@@ -1093,7 +1095,7 @@ function downloadPDF() {
       wrapped.forEach(wl => {
         if (y > pageH - 20) { doc.addPage(); y = 18; }
         doc.text(wl, marginL, y);
-        y += 4.5;
+        y += 4;
       });
     }
   }

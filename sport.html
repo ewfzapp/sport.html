@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Sportif IA – Reprise du Sport Personnalisée | Service Express</title>
+  <meta name="description" content="Obtenez un programme de reprise sportive personnalisé par l'IA. Running, musculation, football, vélo, natation. Préparation 10km, semi-marathon, marathon, ultra. Gratuit, sans inscription.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sport.service-express.org/">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1805732481707409" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #04050f;
+      --surface: rgba(255,255,255,0.05);
+      --surface2: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.09);
+      --border-hover: rgba(255,255,255,0.20);
+      --purple: #a78bfa;
+      --purple-dim: #818cf8;
+      --accent: #7c3aed;
+      --text: #e8eaf6;
+      --muted: #7c85a8;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --teal: #2dd4bf;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 16px 80px;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 55% 45% at 20% 20%, rgba(109,40,217,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 55% at 80% 80%, rgba(30,80,200,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 60% 10%, rgba(45,212,191,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Stars */
+    #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .star {
+      position: absolute; border-radius: 50%; background: #fff; opacity: 0;
+      animation: twinkle var(--dur) var(--delay) infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0; } 50% { opacity: var(--op); }
+    }
+
+    .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+    .nav-brand { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--purple); text-decoration: none; }
+    .nav-back { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .nav-back:hover { color: var(--purple); }
+
+    /* HERO */
+    .hero { text-align: center; margin-bottom: 40px; animation: fadeUp .8s ease both; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      letter-spacing: .16em; text-transform: uppercase;
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 6px 18px; margin-bottom: 20px;
+      background: rgba(255,255,255,0.02);
+    }
+    .dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); display: inline-block; animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(45,212,191,0.4);} 50%{opacity:.5;box-shadow:0 0 0 6px rgba(45,212,191,0);} }
+
+    .hero h1 { font-family: var(--font-display); font-size: clamp(28px, 6vw, 48px); font-weight: 800; line-height: 1.1; margin-bottom: 12px; }
+    .hero h1 span {
+      background: linear-gradient(110deg, #34d399 0%, #2dd4bf 40%, #818cf8 80%, #c084fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 520px; margin: 0 auto; }
+
+    /* STEPPER */
+    .stepper {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; margin-bottom: 32px;
+      animation: fadeUp .8s .1s ease both;
+    }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all .3s;
+      z-index: 1;
+    }
+    .step-num.active { border-color: var(--teal); color: var(--teal); background: rgba(45,212,191,0.1); box-shadow: 0 0 16px rgba(45,212,191,0.25); }
+    .step-num.done { border-color: var(--green); background: rgba(52,211,153,0.15); color: var(--green); }
+    .step-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; }
+    .step-label.active { color: var(--teal); }
+    .step-line { width: 60px; height: 1px; background: var(--border); margin: 0 4px; margin-bottom: 18px; transition: background .3s; }
+    .step-line.done { background: var(--green); }
+    @media (max-width: 480px) { .step-line { width: 30px; } .step-label { font-size: 8px; } }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 16px;
+      animation: fadeUp .6s ease both;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card-title .step-badge {
+      font-size: 11px; color: var(--teal);
+      background: rgba(45,212,191,0.1);
+      border: 1px solid rgba(45,212,191,0.25);
+      border-radius: 100px; padding: 3px 10px;
+      font-family: var(--font-body); font-weight: 500;
+    }
+
+    /* SPORT GRID */
+    .sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 480px) { .sport-grid { grid-template-columns: repeat(2, 1fr); } }
+    .sport-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all .25s;
+      color: var(--muted);
+    }
+    .sport-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .sport-btn.selected { border-color: var(--teal); background: rgba(45,212,191,0.08); color: var(--teal); box-shadow: 0 0 20px rgba(45,212,191,0.15); }
+    .sport-icon { font-size: 28px; }
+    .sport-name { font-size: 12px; font-weight: 600; text-align: center; }
+
+    /* RACE TARGET (running) */
+    .race-targets { display: none; margin-top: 16px; }
+    .race-targets.visible { display: block; }
+    .race-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .race-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .race-btn {
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      color: var(--muted);
+      transition: all .2s;
+      text-align: left;
+    }
+    .race-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .race-btn.selected { border-color: var(--purple); background: rgba(167,139,250,0.1); color: var(--purple); }
+    .race-dist { font-size: 18px; font-weight: 800; font-family: var(--font-display); display: block; }
+
+    /* FORM FIELDS */
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 480px) { .fields-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .field input, .field select {
+      width: 100%; padding: 12px 14px;
+      font-size: 15px; font-weight: 500; font-family: var(--font-body);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--teal); }
+    .field select option { background: #1a1b2e; color: var(--text); }
+
+    /* LEVEL SELECTOR */
+    .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 440px) { .level-grid { grid-template-columns: 1fr; } }
+    .level-btn {
+      padding: 14px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      color: var(--muted);
+    }
+    .level-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .level-btn.selected { border-color: var(--amber); background: rgba(251,191,36,0.08); color: var(--amber); }
+    .level-icon { font-size: 22px; margin-bottom: 6px; }
+    .level-name { font-size: 13px; font-weight: 700; }
+    .level-desc { font-size: 11px; margin-top: 3px; }
+
+    /* TOGGLE CHIPS */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 7px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; color: var(--muted);
+      transition: all .2s;
+    }
+    .chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .chip.selected { border-color: var(--purple-dim); background: rgba(129,140,248,0.12); color: var(--purple-dim); }
+
+    /* DAYS SELECTOR */
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .day-btn {
+      padding: 10px 4px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 11px; font-weight: 600;
+      cursor: pointer; color: var(--muted);
+      text-align: center;
+      transition: all .2s;
+    }
+    .day-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .day-btn.selected { border-color: var(--green); background: rgba(52,211,153,0.1); color: var(--green); }
+
+    /* RANGE SLIDER */
+    .range-wrap { display: flex; align-items: center; gap: 14px; }
+    .range-wrap input[type=range] {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.12);
+      outline: none; border: none; padding: 0;
+    }
+    .range-wrap input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px;
+      border-radius: 50%; background: var(--teal);
+      cursor: pointer; border: 3px solid var(--bg);
+      box-shadow: 0 0 8px rgba(45,212,191,0.4);
+    }
+    .range-val { font-size: 15px; font-weight: 700; color: var(--teal); min-width: 56px; text-align: right; }
+
+    /* BUTTONS */
+    .btn-primary {
+      width: 100%; padding: 15px;
+      font-size: 16px; font-weight: 700; font-family: var(--font-body);
+      background: linear-gradient(135deg, #0f766e, #0891b2, #7c3aed);
+      color: #fff; border: none; border-radius: 14px;
+      cursor: pointer; transition: opacity .2s, transform .15s;
+      margin-top: 8px;
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-secondary {
+      padding: 11px 22px;
+      font-size: 14px; font-weight: 600; font-family: var(--font-body);
+      background: var(--surface);
+      color: var(--muted); border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); }
+
+    .nav-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+
+    /* SECTIONS */
+    .section { display: none; }
+    .section.active { display: block; }
+    .subsection { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .subsection-title { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+
+    /* RESULT */
+    #result-section { display: none; }
+    #result-section.active { display: block; animation: fadeUp .6s ease both; }
+
+    .result-header {
+      background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(124,58,237,0.12));
+      border: 1px solid rgba(45,212,191,0.25);
+      border-radius: 22px; padding: 28px;
+      margin-bottom: 20px; text-align: center;
+    }
+    .result-header h2 { font-family: var(--font-display); font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .result-header p { font-size: 14px; color: var(--muted); }
+
+    .result-meta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
+    .meta-pill {
+      padding: 7px 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 20px; font-size: 12px; color: var(--muted);
+    }
+    .meta-pill strong { color: var(--teal); }
+
+    .program-output {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px;
+      font-size: 14px; line-height: 1.85;
+      color: var(--text);
+      white-space: pre-wrap;
+      min-height: 200px;
+    }
+    .program-output h2, .program-output h3 {
+      font-family: var(--font-display);
+      color: var(--teal); margin: 16px 0 8px;
+    }
+    .program-output h2 { font-size: 18px; }
+    .program-output h3 { font-size: 15px; color: var(--purple); }
+    .program-output strong { color: var(--amber); }
+    .program-output em { color: var(--muted); }
+
+    /* LOADING */
+    .loading-state {
+      text-align: center; padding: 48px 20px;
+    }
+    .loading-spinner {
+      width: 48px; height: 48px; margin: 0 auto 20px;
+      border: 3px solid var(--border);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 15px; color: var(--muted); }
+    .loading-dots::after {
+      content: ''; animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+      0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; }
+    }
+
+    .btn-restart {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 20px; padding: 12px 22px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; font-size: 14px; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-restart:hover { border-color: var(--border-hover); color: var(--text); }
+
+    /* SEO BLOCK */
+    .seo-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px; margin-top: 24px;
+    }
+    .seo-block h2 { font-family: var(--font-display); font-size: 18px; color: var(--purple); margin-bottom: 12px; }
+    .seo-block h3 { font-size: 15px; color: var(--text); margin: 18px 0 8px; }
+    .seo-block p { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 10px; }
+    .seo-block ul { padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 2.1; }
+
+    footer {
+      text-align: center; margin-top: 48px;
+      font-size: 12px; color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+    footer a { color: var(--purple-dim); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-brand { font-family: var(--font-display); font-size: 16px; color: #fff; display: block; margin-bottom: 8px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Streaming cursor */
+    .cursor-blink::after {
+      content: '▋';
+      color: var(--teal);
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+  </style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="wrap">
+
+  <nav>
+    <a class="nav-brand" href="https://service-express.org">⚡ Service Express</a>
+    <a class="nav-back" href="https://service-express.org">← Retour au portail</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge"><span class="dot-pulse"></span> Propulsé par l'IA · Gratuit</div>
+    <h1>🏃 Coach Sportif <span>IA</span></h1>
+    <p>Obtenez un programme de reprise personnalisé en 4 étapes — adapté à votre profil, votre niveau et vos objectifs.</p>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper">
+    <div class="step-item">
+      <div class="step-num active" id="sn-1">1</div>
+      <div class="step-label active" id="sl-1">Sport</div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn-2">2</div>
+      <div class="step-label" id="sl-2">Profil</div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn-3">3</div>
+      <div class="step-label" id="sl-3">Niveau</div>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn-4">4</div>
+      <div class="step-label" id="sl-4">Contexte</div>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 1 : SPORT ══ -->
+  <div class="section active" id="step-1">
+    <div class="card">
+      <div class="card-title">
+        Quel sport souhaitez-vous pratiquer ?
+        <span class="step-badge">Étape 1/4</span>
+      </div>
+      <div class="sport-grid" id="sport-grid">
+        <button class="sport-btn" data-sport="running" onclick="selectSport(this)">
+          <span class="sport-icon">🏃</span>
+          <span class="sport-name">Running</span>
+        </button>
+        <button class="sport-btn" data-sport="musculation" onclick="selectSport(this)">
+          <span class="sport-icon">🏋️</span>
+          <span class="sport-name">Musculation</span>
+        </button>
+        <button class="sport-btn" data-sport="football" onclick="selectSport(this)">
+          <span class="sport-icon">⚽</span>
+          <span class="sport-name">Football</span>
+        </button>
+        <button class="sport-btn" data-sport="velo" onclick="selectSport(this)">
+          <span class="sport-icon">🚴</span>
+          <span class="sport-name">Vélo / Cyclisme</span>
+        </button>
+        <button class="sport-btn" data-sport="natation" onclick="selectSport(this)">
+          <span class="sport-icon">🏊</span>
+          <span class="sport-name">Natation</span>
+        </button>
+        <button class="sport-btn" data-sport="basketball" onclick="selectSport(this)">
+          <span class="sport-icon">🏀</span>
+          <span class="sport-name">Basketball</span>
+        </button>
+      </div>
+
+      <!-- Objectif course -->
+      <div class="race-targets" id="race-targets">
+        <div class="subsection">
+          <div class="subsection-title">Avez-vous un objectif de compétition ? (optionnel)</div>
+          <div class="race-grid">
+            <button class="race-btn" data-race="reprise" onclick="selectRace(this)">
+              <span class="race-dist">Reprise</span>
+              <small>Retrouver la forme</small>
+            </button>
+            <button class="race-btn" data-race="10km" onclick="selectRace(this)">
+              <span class="race-dist">10 km</span>
+              <small>Prépa compétition</small>
+            </button>
+            <button class="race-btn" data-race="semi" onclick="selectRace(this)">
+              <span class="race-dist">Semi-marathon</span>
+              <small>21,097 km</small>
+            </button>
+            <button class="race-btn" data-race="marathon" onclick="selectRace(this)">
+              <span class="race-dist">Marathon</span>
+              <small>42,195 km</small>
+            </button>
+            <button class="race-btn" data-race="ultra" onclick="selectRace(this)">
+              <span class="race-dist">Ultra</span>
+              <small>50 km et au-delà</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <div></div>
+      <button class="btn-primary" style="width:auto;padding:13px 28px;" onclick="goStep(2)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 2 : PROFIL ══ -->
+  <div class="section" id="step-2">
+    <div class="card">
+      <div class="card-title">
+        Votre profil physique
+        <span class="step-badge">Étape 2/4</span>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <label>Âge</label>
+          <input type="number" id="f-age" placeholder="ex : 35" min="15" max="80">
+        </div>
+        <div class="field">
+          <label>Sexe</label>
+          <select id="f-sexe">
+            <option value="">Choisir…</option>
+            <option value="homme">Homme</option>
+            <option value="femme">Femme</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Poids (kg)</label>
+          <input type="number" id="f-poids" placeholder="ex : 78" min="40" max="200">
+        </div>
+        <div class="field">
+          <label>Taille (cm)</label>
+          <input type="number" id="f-taille" placeholder="ex : 175" min="140" max="220">
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Depuis combien de temps êtes-vous inactif(ve) ?</div>
+        <div class="chip-group" id="inactivite-chips">
+          <div class="chip" data-val="quelques semaines" onclick="selectChip(this,'inactivite')">Quelques semaines</div>
+          <div class="chip" data-val="2-3 mois" onclick="selectChip(this,'inactivite')">2–3 mois</div>
+          <div class="chip" data-val="6 mois" onclick="selectChip(this,'inactivite')">6 mois</div>
+          <div class="chip" data-val="1 an" onclick="selectChip(this,'inactivite')">1 an</div>
+          <div class="chip" data-val="plus de 2 ans" onclick="selectChip(this,'inactivite')">+ de 2 ans</div>
+          <div class="chip" data-val="jamais pratiqué" onclick="selectChip(this,'inactivite')">Jamais pratiqué</div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Avez-vous des blessures ou contre-indications ? (optionnel)</div>
+        <div class="chip-group" id="blessure-chips">
+          <div class="chip" data-val="genou" onclick="selectChip(this,'blessure')">Genou</div>
+          <div class="chip" data-val="dos" onclick="selectChip(this,'blessure')">Dos</div>
+          <div class="chip" data-val="cheville" onclick="selectChip(this,'blessure')">Cheville</div>
+          <div class="chip" data-val="epaule" onclick="selectChip(this,'blessure')">Épaule</div>
+          <div class="chip" data-val="surpoids important" onclick="selectChip(this,'blessure')">Surpoids important</div>
+          <div class="chip" data-val="problemes cardiaques" onclick="selectChip(this,'blessure')">Problèmes cardiaques</div>
+          <div class="chip" data-val="aucune" onclick="selectChip(this,'blessure')">Aucune</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="goStep(1)">← Retour</button>
+      <button class="btn-primary" style="width:auto;padding:13px 28px;" onclick="goStep(3)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 3 : NIVEAU ══ -->
+  <div class="section" id="step-3">
+    <div class="card">
+      <div class="card-title">
+        Votre niveau &amp; vos objectifs
+        <span class="step-badge">Étape 3/4</span>
+      </div>
+
+      <div class="subsection-title" style="margin-bottom:12px;">Votre niveau actuel</div>
+      <div class="level-grid">
+        <button class="level-btn" data-level="debutant" onclick="selectLevel(this)">
+          <div class="level-icon">🌱</div>
+          <div class="level-name">Débutant</div>
+          <div class="level-desc" style="font-size:11px;color:var(--muted);">Peu ou jamais pratiqué</div>
+        </button>
+        <button class="level-btn" data-level="intermediaire" onclick="selectLevel(this)">
+          <div class="level-icon">⚡</div>
+          <div class="level-name">Intermédiaire</div>
+          <div class="level-desc" style="font-size:11px;color:var(--muted);">Anciennement actif</div>
+        </button>
+        <button class="level-btn" data-level="avance" onclick="selectLevel(this)">
+          <div class="level-icon">🔥</div>
+          <div class="level-name">Avancé</div>
+          <div class="level-desc" style="font-size:11px;color:var(--muted);">Pratique régulière passée</div>
+        </button>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Votre objectif principal</div>
+        <div class="chip-group" id="objectif-chips">
+          <div class="chip" data-val="reprise douce" onclick="selectChip(this,'objectif')">Reprise douce</div>
+          <div class="chip" data-val="perte de poids" onclick="selectChip(this,'objectif')">Perte de poids</div>
+          <div class="chip" data-val="ameliorer endurance" onclick="selectChip(this,'objectif')">Améliorer l'endurance</div>
+          <div class="chip" data-val="prendre du muscle" onclick="selectChip(this,'objectif')">Prendre du muscle</div>
+          <div class="chip" data-val="performance" onclick="selectChip(this,'objectif')">Performance</div>
+          <div class="chip" data-val="bien-etre general" onclick="selectChip(this,'objectif')">Bien-être général</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="goStep(2)">← Retour</button>
+      <button class="btn-primary" style="width:auto;padding:13px 28px;" onclick="goStep(4)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 4 : CONTEXTE ══ -->
+  <div class="section" id="step-4">
+    <div class="card">
+      <div class="card-title">
+        Votre contexte pratique
+        <span class="step-badge">Étape 4/4</span>
+      </div>
+
+      <div class="subsection-title" style="margin-bottom:12px;">Jours disponibles par semaine</div>
+      <div class="days-grid" id="days-grid">
+        <div class="day-btn" data-day="Lun" onclick="toggleDay(this)">Lun</div>
+        <div class="day-btn" data-day="Mar" onclick="toggleDay(this)">Mar</div>
+        <div class="day-btn" data-day="Mer" onclick="toggleDay(this)">Mer</div>
+        <div class="day-btn" data-day="Jeu" onclick="toggleDay(this)">Jeu</div>
+        <div class="day-btn" data-day="Ven" onclick="toggleDay(this)">Ven</div>
+        <div class="day-btn" data-day="Sam" onclick="toggleDay(this)">Sam</div>
+        <div class="day-btn" data-day="Dim" onclick="toggleDay(this)">Dim</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Durée par séance</div>
+        <div class="range-wrap">
+          <input type="range" id="duree-range" min="20" max="120" value="45" step="5" oninput="updateDuree(this.value)">
+          <span class="range-val" id="duree-val">45 min</span>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Accès &amp; équipement disponible</div>
+        <div class="chip-group" id="equipement-chips">
+          <div class="chip" data-val="salle de sport" onclick="selectChip(this,'equipement')">Salle de sport</div>
+          <div class="chip" data-val="exterieur uniquement" onclick="selectChip(this,'equipement')">Extérieur uniquement</div>
+          <div class="chip" data-val="maison sans materiel" onclick="selectChip(this,'equipement')">Maison sans matériel</div>
+          <div class="chip" data-val="poids libres maison" onclick="selectChip(this,'equipement')">Poids libres à la maison</div>
+          <div class="chip" data-val="piscine" onclick="selectChip(this,'equipement')">Piscine</div>
+          <div class="chip" data-val="velo appartement" onclick="selectChip(this,'equipement')">Vélo d'appartement</div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Informations complémentaires (optionnel)</div>
+        <textarea id="f-extra" placeholder="Ex : je veux courir un 10km dans 3 mois, j'ai un genou fragile, je travaille la nuit…" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;resize:vertical;min-height:80px;outline:none;" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="generateProgram()">🚀 Générer mon programme personnalisé</button>
+    </div>
+    <div class="nav-btns" style="margin-top:4px;">
+      <button class="btn-secondary" onclick="goStep(3)">← Retour</button>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- ══ RÉSULTAT ══ -->
+  <div id="result-section">
+    <div class="result-header">
+      <h2 id="result-title">🏆 Votre Programme Personnalisé</h2>
+      <p id="result-subtitle">Généré par l'IA en fonction de votre profil</p>
+      <div class="result-meta" id="result-meta"></div>
+    </div>
+
+    <div class="program-output" id="program-output">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Analyse de votre profil<span class="loading-dots"></span></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn-restart" onclick="restart()">🔄 Recommencer avec un autre profil</button>
+    </div>
+  </div>
+
+  <!-- SEO -->
+  <div class="seo-block" id="seo-block">
+    <h2>Pourquoi utiliser un programme de reprise sportive ?</h2>
+    <p>Reprendre le sport après une période d'inactivité nécessite une progression adaptée. Un programme personnalisé permet d'éviter les blessures, de maintenir la motivation et d'atteindre ses objectifs durablement.</p>
+    <h3>Les sports proposés</h3>
+    <ul>
+      <li><strong>Running :</strong> idéal pour l'endurance cardiovasculaire, avec option prépa compétition (10 km, semi-marathon, marathon, ultra)</li>
+      <li><strong>Musculation :</strong> renforcement musculaire progressif, adapté aux débutants comme aux pratiquants expérimentés</li>
+      <li><strong>Football :</strong> sport collectif alliant cardio, agilité et technique</li>
+      <li><strong>Vélo / Cyclisme :</strong> sport à faible impact articulaire, parfait pour les reprises douces</li>
+      <li><strong>Natation :</strong> sport complet sans impact, recommandé en cas de blessures</li>
+      <li><strong>Basketball :</strong> sport collectif intense, travail d'explosivité et de coordination</li>
+    </ul>
+    <h3>Comment est construit votre programme ?</h3>
+    <p>L'IA analyse votre âge, poids, niveau d'inactivité, objectifs et disponibilités pour créer un programme semaine par semaine. Chaque séance est décrite précisément avec durée, intensité et exercices.</p>
+  </div>
+
+  <footer>
+    <span class="footer-brand">⚡ Service Express</span>
+    <p>© 2026 &nbsp;·&nbsp; <a href="https://service-express.org/privacy.html">Confidentialité</a> &nbsp;·&nbsp; <a href="https://service-express.org">Retour au portail</a></p>
+  </footer>
+</div>
+
+<script>
+/* ── Stars ── */
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 100; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const sz = Math.random() * 2 + 0.5;
+  s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${(Math.random()*5+3).toFixed(1)}s;--delay:${(Math.random()*6).toFixed(1)}s;--op:${(Math.random()*.4+.1).toFixed(2)}`;
+  starsEl.appendChild(s);
+}
+
+/* ── State ── */
+const state = {
+  sport: null,
+  race: null,
+  age: null, sexe: null, poids: null, taille: null,
+  inactivite: null,
+  blessures: [],
+  level: null,
+  objectif: null,
+  days: [],
+  duree: 45,
+  equipement: [],
+  extra: ''
+};
+
+let currentStep = 1;
+
+/* ── Navigation ── */
+function goStep(n) {
+  if (n === 2 && !state.sport) { alert('Veuillez sélectionner un sport.'); return; }
+  if (n === 3) {
+    const age = parseInt(document.getElementById('f-age').value);
+    const poids = parseInt(document.getElementById('f-poids').value);
+    const taille = parseInt(document.getElementById('f-taille').value);
+    if (!age || !poids || !taille || !document.getElementById('f-sexe').value) {
+      alert('Veuillez remplir votre âge, sexe, poids et taille.'); return;
+    }
+    if (!state.inactivite) { alert("Indiquez depuis combien de temps vous êtes inactif(ve)."); return; }
+    state.age = age; state.poids = poids; state.taille = taille;
+    state.sexe = document.getElementById('f-sexe').value;
+  }
+  if (n === 4 && !state.level) { alert('Veuillez sélectionner votre niveau.'); return; }
+
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-' + currentStep).classList.add('active');
+  updateStepper();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStepper() {
+  for (let i = 1; i <= 4; i++) {
+    const num = document.getElementById('sn-' + i);
+    const lbl = document.getElementById('sl-' + i);
+    num.classList.remove('active', 'done');
+    lbl.classList.remove('active');
+    if (i < currentStep) { num.classList.add('done'); num.textContent = '✓'; }
+    else if (i === currentStep) { num.classList.add('active'); lbl.classList.add('active'); num.textContent = i; }
+    else { num.textContent = i; }
+    if (i < 4) {
+      const line = document.getElementById('line-' + i);
+      line.classList.toggle('done', i < currentStep);
+    }
+  }
+}
+
+/* ── Selectors ── */
+function selectSport(btn) {
+  document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.sport = btn.dataset.sport;
+  const rt = document.getElementById('race-targets');
+  if (state.sport === 'running') {
+    rt.classList.add('visible');
+  } else {
+    rt.classList.remove('visible');
+    state.race = null;
+    document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
+
+function selectRace(btn) {
+  document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.race = btn.dataset.race;
+}
+
+function selectLevel(btn) {
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.level = btn.dataset.level;
+}
+
+function selectChip(chip, group) {
+  const groupChips = document.querySelectorAll(`#${group}-chips .chip`);
+  const multi = ['blessure', 'equipement'].includes(group);
+  if (multi) {
+    chip.classList.toggle('selected');
+    const vals = [...groupChips].filter(c => c.classList.contains('selected')).map(c => c.dataset.val);
+    if (group === 'blessure') state.blessures = vals;
+    if (group === 'equipement') state.equipement = vals;
+  } else {
+    groupChips.forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    if (group === 'inactivite') state.inactivite = chip.dataset.val;
+    if (group === 'objectif') state.objectif = chip.dataset.val;
+  }
+}
+
+function toggleDay(btn) {
+  btn.classList.toggle('selected');
+  const day = btn.dataset.day;
+  if (btn.classList.contains('selected')) {
+    if (!state.days.includes(day)) state.days.push(day);
+  } else {
+    state.days = state.days.filter(d => d !== day);
+  }
+}
+
+function updateDuree(v) {
+  state.duree = parseInt(v);
+  document.getElementById('duree-val').textContent = v + ' min';
+}
+
+/* ── Generate ── */
+async function generateProgram() {
+  state.extra = document.getElementById('f-extra').value.trim();
+  if (state.days.length === 0) { alert('Sélectionnez au moins un jour disponible.'); return; }
+  if (!state.objectif) { alert('Sélectionnez votre objectif principal.'); return; }
+
+  // Hide form, show result
+  for (let i = 1; i <= 4; i++) document.getElementById('step-' + i).classList.remove('active');
+  document.getElementById('stepper').style.display = 'none';
+  document.getElementById('seo-block').style.display = 'none';
+
+  const rs = document.getElementById('result-section');
+  rs.style.display = 'block';
+  rs.classList.add('active');
+
+  // Build meta pills
+  const sportLabels = { running:'🏃 Running', musculation:'🏋️ Musculation', football:'⚽ Football', velo:'🚴 Vélo', natation:'🏊 Natation', basketball:'🏀 Basketball' };
+  const raceLabel = state.race && state.race !== 'reprise' ? ` · Objectif ${state.race}` : '';
+  document.getElementById('result-title').textContent = `🏆 Programme ${sportLabels[state.sport] || state.sport}${raceLabel}`;
+  document.getElementById('result-meta').innerHTML = [
+    `<div class="meta-pill"><strong>${state.age} ans</strong> · ${state.sexe}</div>`,
+    `<div class="meta-pill"><strong>${state.poids} kg</strong> · ${state.taille} cm</div>`,
+    `<div class="meta-pill">Niveau <strong>${state.level}</strong></div>`,
+    `<div class="meta-pill"><strong>${state.days.length} jours/sem</strong> · ${state.duree} min</div>`,
+  ].join('');
+
+  // Build prompt
+  const imc = (state.poids / ((state.taille/100) ** 2)).toFixed(1);
+  const blessuresStr = state.blessures.length ? state.blessures.join(', ') : 'aucune';
+  const equipStr = state.equipement.length ? state.equipement.join(', ') : 'non précisé';
+  const raceCtx = state.sport === 'running' && state.race && state.race !== 'reprise'
+    ? `Objectif de compétition : ${state.race}.` : '';
+
+  const prompt = `Tu es un coach sportif expert. Génère un programme de reprise sportive COMPLET et DÉTAILLÉ en français pour la personne suivante.
+
+PROFIL :
+- Sport : ${state.sport}${raceCtx ? ' · ' + raceCtx : ''}
+- Âge : ${state.age} ans | Sexe : ${state.sexe} | Poids : ${state.poids} kg | Taille : ${state.taille} cm | IMC : ${imc}
+- Inactivité : ${state.inactivite}
+- Blessures/contre-indications : ${blessuresStr}
+- Niveau : ${state.level}
+- Objectif : ${state.objectif}
+- Jours dispo : ${state.days.join(', ')} (${state.days.length} jours/semaine)
+- Durée par séance : ${state.duree} minutes
+- Équipement : ${equipStr}
+${state.extra ? '- Infos complémentaires : ' + state.extra : ''}
+
+INSTRUCTIONS :
+${state.sport === 'running' && state.race && state.race !== 'reprise'
+  ? `Il s'agit d'une préparation à un ${state.race}. Structure le programme en phases (fondation, développement, spécifique, affûtage).`
+  : 'Structure le programme en 3 phases (adaptation, progression, consolidation).'}
+
+Pour chaque semaine, détaille :
+- Le nom et objectif de la séance pour chaque jour disponible
+- Les exercices avec séries/répétitions/distances/temps selon le sport
+- L'intensité et la fréquence cardiaque cible si pertinent
+- Les conseils de récupération
+
+Commence par un résumé du programme (durée totale, structure). Termine par 5 conseils personnalisés clés.
+Adapte strictement les exercices aux blessures et à l'équipement disponible.
+Sois très précis et concret. Format : titres en ## et ###, listes à tirets.`;
+
+  const output = document.getElementById('program-output');
+  output.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Création de votre programme personnalisé<span class="loading-dots"></span></div></div>';
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+
+    output.innerHTML = '';
+    output.classList.add('cursor-blink');
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const evt = JSON.parse(data);
+          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+            fullText += evt.delta.text;
+            output.innerHTML = renderMarkdown(fullText);
+          }
+        } catch {}
+      }
+    }
+
+    output.classList.remove('cursor-blink');
+    output.innerHTML = renderMarkdown(fullText);
+
+  } catch (err) {
+    output.classList.remove('cursor-blink');
+    output.innerHTML = `<div style="color:var(--red);padding:20px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">⚠️</div>
+      <strong>Erreur de génération</strong><br>
+      <span style="color:var(--muted);font-size:13px;">${err.message}</span>
+    </div>`;
+  }
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^- (.+)$/gm, '<li style="margin-left:18px;margin-bottom:4px;">$1</li>')
+    .replace(/\n/g, '<br>');
+}
+
+function restart() {
+  location.reload();
+}
+</script>
+</body>
+</html>

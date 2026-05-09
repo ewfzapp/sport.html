@@ -876,34 +876,35 @@ async function generateProgram() {
   const raceCtx = state.sport === 'running' && state.race && state.race !== 'reprise'
     ? `Objectif de compétition : ${state.race}.` : '';
 
-  const prompt = `Tu es un coach sportif expert. Génère un programme de reprise sportive COMPLET et DÉTAILLÉ en français pour la personne suivante.
+  const prompt = `Tu es un coach sportif expert. Génère un programme de reprise sportive COMPLET en français. Sois CONCIS : chaque séance en 3-4 lignes maximum, pas de phrases longues.
 
 PROFIL :
 - Sport : ${state.sport}${raceCtx ? ' · ' + raceCtx : ''}
 - Âge : ${state.age} ans | Sexe : ${state.sexe} | Poids : ${state.poids} kg | Taille : ${state.taille} cm | IMC : ${imc}
-- Inactivité : ${state.inactivite}
-- Blessures/contre-indications : ${blessuresStr}
-- Niveau : ${state.level}
-- Objectif : ${state.objectif}
-- Jours dispo : ${state.days.join(', ')} (${state.days.length} jours/semaine)
-- Durée par séance : ${state.duree} minutes
-- Équipement : ${equipStr}
-${state.extra ? '- Infos complémentaires : ' + state.extra : ''}
+- Inactivité : ${state.inactivite} | Blessures : ${blessuresStr}
+- Niveau : ${state.level} | Objectif : ${state.objectif}
+- Jours : ${state.days.join(', ')} (${state.days.length}j/sem) | Durée : ${state.duree} min | Équipement : ${equipStr}
+${state.extra ? '- Notes : ' + state.extra : ''}
 
-INSTRUCTIONS :
-${state.sport === 'running' && state.race && state.race !== 'reprise'
-  ? `Il s'agit d'une préparation à un ${state.race}. Structure le programme en phases (fondation, développement, spécifique, affûtage).`
-  : 'Structure le programme en 3 phases (adaptation, progression, consolidation).'}
+FORMAT STRICT (respecter impérativement) :
+## Résumé (5 lignes max : durée totale, phases, volume)
+## Phase X : Nom (Semaines X-X)
+### Semaine X
+#### JOUR - Nom séance
+- Objectif : ...
+- Contenu : ... (exercices, durées, distances en 2-3 lignes)
+- Intensité : FC cible ...
+[ligne vide entre chaque séance, pas de blocs récupération séparés]
+## 5 Conseils clés (liste courte)
 
-Pour chaque semaine, détaille :
-- Le nom et objectif de la séance pour chaque jour disponible
-- Les exercices avec séries/répétitions/distances/temps selon le sport
-- L'intensité et la fréquence cardiaque cible si pertinent
-- Les conseils de récupération
-
-Commence par un résumé du programme (durée totale, structure). Termine par 5 conseils personnalisés clés.
-Adapte strictement les exercices aux blessures et à l'équipement disponible.
-Sois très précis et concret. Format : titres en ## et ###, listes à tirets.`;
+RÈGLES :
+- ${state.sport === 'running' && state.race && state.race !== 'reprise'
+    ? `Prépa ${state.race} : phases fondation/développement/spécifique/affûtage. Toutes les semaines.`
+    : 'Phases adaptation/progression/consolidation. Toutes les semaines.'}
+- Couvrir TOUTES les semaines du programme sans exception
+- Maximum 4 lignes par séance
+- Pas de tableaux, pas de répétition de blocs récupération
+- Titres : ## pour phases, ### pour semaines, #### pour séances`;
 
   const output = document.getElementById('program-output');
   output.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Création de votre programme personnalisé<span class="loading-dots"></span></div></div>';

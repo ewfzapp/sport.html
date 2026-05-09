@@ -966,11 +966,14 @@ Sois très précis et concret. Format : titres en ## et ###, listes à tirets.`;
 
 function renderMarkdown(text) {
   return text
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^#{4,} (.+)$/gm, '<h4 style="font-size:13px;color:var(--amber);margin:10px 0 4px;font-family:var(--font-display)">$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0">')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^- (.+)$/gm, '<li style="margin-left:18px;margin-bottom:4px;">$1</li>')
+    .replace(/^[-•] (.+)$/gm, '<li style="margin-left:18px;margin-bottom:4px;">$1</li>')
     .replace(/\n/g, '<br>');
 }
 
@@ -1030,7 +1033,7 @@ function downloadPDF() {
       y = 18;
     }
 
-    if (line.startsWith('## ')) {
+    if (line.startsWith('## ') || (line.startsWith('# ') && !line.startsWith('###'))) {
       // Titre H2
       if (y > marginT + 5) y += 3;
       doc.setFillColor(20, 24, 50);
@@ -1038,7 +1041,7 @@ function downloadPDF() {
       doc.setFontSize(12);
       doc.setTextColor(45, 212, 191);
       doc.setFont('helvetica', 'bold');
-      doc.text(line.replace('## ', ''), marginL + 2, y);
+      doc.text(line.replace(/^#{1,2} /, ''), marginL + 2, y);
       y += 8;
 
     } else if (line.startsWith('### ')) {
@@ -1049,6 +1052,22 @@ function downloadPDF() {
       doc.setFont('helvetica', 'bold');
       doc.text(line.replace('### ', ''), marginL, y);
       y += 6;
+
+    } else if (/^#{4,}/.test(line)) {
+      // Titre H4
+      y += 1;
+      doc.setFontSize(9);
+      doc.setTextColor(251, 191, 36);
+      doc.setFont('helvetica', 'bold');
+      doc.text(line.replace(/^#{4,} /, ''), marginL, y);
+      y += 5;
+
+    } else if (/^-{3,}$/.test(line)) {
+      // Séparateur ---
+      doc.setDrawColor(50, 55, 80);
+      doc.setLineWidth(0.3);
+      doc.line(marginL, y, pageW - marginR, y);
+      y += 5;
 
     } else if (line.startsWith('- ')) {
       // Liste

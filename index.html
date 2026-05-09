@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --bg: #04050f;
@@ -360,6 +361,18 @@
     }
     .btn-restart:hover { border-color: var(--border-hover); color: var(--text); }
 
+    .btn-pdf {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 20px; margin-left: 12px; padding: 12px 22px;
+      background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(124,58,237,0.15));
+      border: 1px solid rgba(45,212,191,0.35);
+      border-radius: 12px; font-size: 14px; font-weight: 600;
+      color: var(--teal); cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-pdf:hover { background: linear-gradient(135deg, rgba(45,212,191,0.25), rgba(124,58,237,0.25)); border-color: var(--teal); }
+    .btn-pdf:disabled { opacity: .4; cursor: not-allowed; }
+
     /* SEO BLOCK */
     .seo-block {
       background: var(--surface); border: 1px solid var(--border);
@@ -678,6 +691,7 @@
 
     <div style="text-align:center;margin-top:20px;">
       <button class="btn-restart" onclick="restart()">🔄 Recommencer avec un autre profil</button>
+      <button class="btn-pdf" id="btn-pdf" onclick="downloadPDF()" disabled>⬇️ Télécharger en PDF</button>
     </div>
   </div>
 
@@ -935,6 +949,10 @@ Sois très précis et concret. Format : titres en ## et ###, listes à tirets.`;
 
     output.classList.remove('cursor-blink');
     output.innerHTML = renderMarkdown(fullText);
+    // Activer le bouton PDF
+    document.getElementById('btn-pdf').disabled = false;
+    window._programText = fullText;
+    window._programTitle = document.getElementById('result-title').textContent;
 
   } catch (err) {
     output.classList.remove('cursor-blink');
@@ -958,6 +976,121 @@ function renderMarkdown(text) {
 
 function restart() {
   location.reload();
+}
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const marginL = 15, marginR = 15, marginT = 20;
+  const pageW = 210, pageH = 297;
+  const contentW = pageW - marginL - marginR;
+  let y = marginT;
+
+  const title = (window._programTitle || 'Programme Sportif').replace(/[🏆🏃🏋️⚽🚴🏊🏀]/gu, '').trim();
+  const text  = window._programText || '';
+
+  // ── En-tête ──
+  doc.setFillColor(13, 14, 30);
+  doc.rect(0, 0, pageW, 28, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(125, 133, 168);
+  doc.text('Service Express · sport.service-express.org', marginL, 10);
+  doc.setFontSize(15);
+  doc.setTextColor(45, 212, 191);
+  doc.setFont('helvetica', 'bold');
+  doc.text(title, marginL, 21);
+  y = 38;
+
+  // ── Méta-infos ──
+  const pills = document.querySelectorAll('.meta-pill');
+  if (pills.length) {
+    doc.setFontSize(8.5);
+    doc.setTextColor(125, 133, 168);
+    doc.setFont('helvetica', 'normal');
+    const metaLine = [...pills].map(p => p.textContent.trim()).join('   ·   ');
+    doc.text(metaLine, marginL, y);
+    y += 6;
+    doc.setDrawColor(45, 212, 191, 0.3);
+    doc.setLineWidth(0.3);
+    doc.line(marginL, y, pageW - marginR, y);
+    y += 8;
+  }
+
+  // ── Corps du programme ──
+  const lines = text.split('\n');
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) { y += 3; continue; }
+
+    // Nouvelle page si besoin
+    if (y > pageH - 20) {
+      doc.addPage();
+      y = 18;
+    }
+
+    if (line.startsWith('## ')) {
+      // Titre H2
+      if (y > marginT + 5) y += 3;
+      doc.setFillColor(20, 24, 50);
+      doc.rect(marginL, y - 5, contentW, 9, 'F');
+      doc.setFontSize(12);
+      doc.setTextColor(45, 212, 191);
+      doc.setFont('helvetica', 'bold');
+      doc.text(line.replace('## ', ''), marginL + 2, y);
+      y += 8;
+
+    } else if (line.startsWith('### ')) {
+      // Titre H3
+      y += 2;
+      doc.setFontSize(10);
+      doc.setTextColor(167, 139, 250);
+      doc.setFont('helvetica', 'bold');
+      doc.text(line.replace('### ', ''), marginL, y);
+      y += 6;
+
+    } else if (line.startsWith('- ')) {
+      // Liste
+      doc.setFontSize(8.5);
+      doc.setTextColor(200, 205, 230);
+      doc.setFont('helvetica', 'normal');
+      const bullet = line.replace(/^- /, '').replace(/\*\*(.+?)\*\*/g, '$1');
+      const wrapped = doc.splitTextToSize('• ' + bullet, contentW - 4);
+      wrapped.forEach((wl, i) => {
+        if (y > pageH - 20) { doc.addPage(); y = 18; }
+        doc.text(wl, marginL + (i === 0 ? 0 : 4), y);
+        y += 4.5;
+      });
+
+    } else {
+      // Paragraphe normal
+      doc.setFontSize(8.5);
+      doc.setTextColor(180, 185, 210);
+      doc.setFont('helvetica', 'normal');
+      const clean = line.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+      const wrapped = doc.splitTextToSize(clean, contentW);
+      wrapped.forEach(wl => {
+        if (y > pageH - 20) { doc.addPage(); y = 18; }
+        doc.text(wl, marginL, y);
+        y += 4.5;
+      });
+    }
+  }
+
+  // ── Pied de page sur chaque page ──
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7.5);
+    doc.setTextColor(80, 88, 110);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Service Express · Coach Sportif IA · Page ${p}/${totalPages}`, marginL, pageH - 8);
+    doc.text('sport.service-express.org', pageW - marginR, pageH - 8, { align: 'right' });
+  }
+
+  const sportLabel = (window._programTitle || 'programme').replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase();
+  doc.save(`${sportLabel}-service-express.pdf`);
 }
 </script>
 </body>
